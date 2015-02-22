@@ -111,6 +111,7 @@ module Que
 
       # JSON.
       CAST_PROCS[114] = JSON_MODULE.method(:load)
+      CAST_PROCS["args"] = CAST_PROCS[114]
 
       # Boolean:
       CAST_PROCS[16] = 't'.method(:==)
@@ -119,7 +120,8 @@ module Que
         output = result.to_a
 
         result.fields.each_with_index do |field, index|
-          if converter = CAST_PROCS[result.ftype(index)]
+          converter = CAST_PROCS[field] || CAST_PROCS[result.ftype(index)]
+          if converter
             output.each do |hash|
               unless (value = hash[field]).nil?
                 hash[field] = converter.call(value)
